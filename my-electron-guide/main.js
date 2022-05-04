@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron')
 const path = require('path')
 
 async function handleFileOpen() {
@@ -19,15 +19,39 @@ const createWindow = () => {
 		},
 	})
 
+	const menu = Menu.buildFromTemplate([
+		{
+			label: app.name,
+			submenu: [
+				{
+					click: () => win.webContents.send('update-counter', 1),
+					label: 'Increment',
+				},
+				{
+					click: () => win.webContents.send('update-counter', -1),
+					label: 'Decrement',
+				},
+			],
+		},
+	])
+
+	Menu.setApplicationMenu(menu)
+
 	win.loadFile('index.html')
 	ipcMain.on('set-title', (event, title) => {
 		const webContents = event.sender
 		const win = BrowserWindow.fromWebContents(webContents)
 		win.setTitle(title)
 	})
+	// Open the DevTools.
+	win.webContents.openDevTools()
 }
 app.whenReady().then(() => {
 	ipcMain.handle('dialog:openFile', handleFileOpen)
+	ipcMain.on('counter-value', (_event, value) => {
+		console.log(value) // will print value to Node console
+	})
+
 	createWindow()
 	app.on('activate', () => {
 		if (BrowserWindow.getAllWindows().length === 0) createWindow()
