@@ -1,7 +1,7 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
 // 在上下文隔离启用的情况下使用预加载
-const { contextBridge } = require('electron')
+const { contextBridge, ipcRenderer } = require('electron')
 
 window.addEventListener('DOMContentLoaded', () => {
 	const replaceText = (selector, text) => {
@@ -19,4 +19,8 @@ contextBridge.exposeInMainWorld('myAPI', {
 		console.log('doAThing')
 	},
 	loadPreferences: () => ipcRenderer.invoke('load-prefs'),
+})
+
+contextBridge.exposeInMainWorld('electronAPI', {
+	setTitle: (title) => ipcRenderer.send('set-title', title),
 })

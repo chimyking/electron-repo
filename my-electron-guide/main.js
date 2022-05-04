@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const createWindow = () => {
 	const win = new BrowserWindow({
@@ -10,6 +10,11 @@ const createWindow = () => {
 	})
 
 	win.loadFile('index.html')
+	ipcMain.on('set-title', (event, title) => {
+		const webContents = event.sender
+		const win = BrowserWindow.fromWebContents(webContents)
+		win.setTitle(title)
+	})
 }
 app.whenReady().then(() => {
 	createWindow()
