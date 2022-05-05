@@ -39,3 +39,33 @@ document
 		await window.darkMode.system()
 		document.getElementById('theme-source').innerHTML = 'System'
 	})
+
+async function testIt() {
+	const device = await navigator.bluetooth.requestDevice({
+		acceptAllDevices: true,
+	})
+	document.getElementById('device-name').innerHTML =
+		device.name || `ID: ${device.id}`
+}
+
+document.getElementById('clickme').addEventListener('click', testIt)
+
+async function testIt1() {
+	const grantedDevices = await navigator.hid.getDevices()
+	let grantedDeviceList = ''
+	grantedDevices.forEach((device) => {
+		grantedDeviceList += `<hr>${device.productName}</hr>`
+	})
+	document.getElementById('granted-devices').innerHTML = grantedDeviceList
+	const grantedDevices2 = await navigator.hid.requestDevice({
+		filters: [],
+	})
+
+	grantedDeviceList = ''
+	grantedDevices2.forEach((device) => {
+		grantedDeviceList += `<hr>${device.productName}</hr>`
+	})
+	document.getElementById('granted-devices2').innerHTML = grantedDeviceList
+}
+
+document.getElementById('clickme1').addEventListener('click', testIt1)

@@ -45,6 +45,49 @@ const createWindow = () => {
 	Menu.setApplicationMenu(menu)
 
 	win.loadFile('index.html')
+
+	win.webContents.on(
+		'select-bluetooth-device',
+		(event, deviceList, callback) => {
+			event.preventDefault()
+			if (deviceList && deviceList.length > 0) {
+				callback(deviceList[0].deviceId)
+			}
+		}
+	)
+
+	win.webContents.session.on(
+		'select-hid-device',
+		(event, details, callback) => {
+			event.preventDefault()
+			if (details.deviceList && details.deviceList.length > 0) {
+				callback(details.deviceList[0].deviceId)
+			}
+		}
+	)
+
+	win.webContents.session.on('hid-device-added', (event, device) => {
+		console.log('hid-device-added FIRED WITH', device)
+	})
+
+	win.webContents.session.on('hid-device-removed', (event, device) => {
+		console.log('hid-device-removed FIRED WITH', device)
+	})
+
+	win.webContents.session.setPermissionCheckHandler(
+		(webContents, permission, requestingOrigin, details) => {
+			if (permission === 'hid' && details.securityOrigin === 'file:///') {
+				return true
+			}
+		}
+	)
+
+	win.webContents.session.setDevicePermissionHandler((details) => {
+		if (details.deviceType === 'hid' && details.origin === 'file://') {
+			return true
+		}
+	})
+
 	ipcMain.on('set-title', (event, title) => {
 		const webContents = event.sender
 		const win = BrowserWindow.fromWebContents(webContents)
