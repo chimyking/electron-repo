@@ -1,4 +1,11 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron')
+const {
+	app,
+	BrowserWindow,
+	ipcMain,
+	dialog,
+	Menu,
+	nativeTheme,
+} = require('electron')
 const path = require('path')
 
 async function handleFileOpen() {
@@ -42,6 +49,19 @@ const createWindow = () => {
 		const webContents = event.sender
 		const win = BrowserWindow.fromWebContents(webContents)
 		win.setTitle(title)
+	})
+
+	ipcMain.handle('dark-mode:toggle', () => {
+		if (nativeTheme.shouldUseDarkColors) {
+			nativeTheme.themeSource = 'light'
+		} else {
+			nativeTheme.themeSource = 'dark'
+		}
+		return nativeTheme.shouldUseDarkColors
+	})
+
+	ipcMain.handle('dark-mode:system', () => {
+		nativeTheme.themeSource = 'system'
 	})
 	// Open the DevTools.
 	win.webContents.openDevTools()

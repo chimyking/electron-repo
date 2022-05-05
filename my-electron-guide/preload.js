@@ -26,3 +26,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 	openFile: () => ipcRenderer.invoke('dialog:openFile'),
 	handleCounter: (callback) => ipcRenderer.on('update-counter', callback),
 })
+
+contextBridge.exposeInMainWorld('darkMode', {
+	toggle: () => ipcRenderer.invoke('dark-mode:toggle'),
+	system: () => ipcRenderer.invoke('dark-mode:system'),
+})
